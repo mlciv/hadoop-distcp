@@ -290,8 +290,7 @@ public class CopyMapper extends Mapper<Text, CopyListingFileStatus, Text, Text> 
     LOG.error("Failure in copying " + sourceFileStatus.getPath() + " to " +
                 target, exception);
 
-    if (ignoreFailures && exception.getCause() instanceof
-            RetriableFileCopyCommand.CopyReadException) {
+    if (ignoreFailures) {
       incrementCounter(context, Counter.FAIL, 1);
       incrementCounter(context, Counter.BYTESFAILED, sourceFileStatus.getLen());
       context.write(null, new Text("FAIL: " + sourceFileStatus.getPath() + " - " +
