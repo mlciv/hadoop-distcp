@@ -5,3 +5,58 @@ each of which will copy a partition of the files specified in the source list.
 
 Version 0.1 (2010/08/02 sriksun)
  - Initial Version
+
+# Goal of Version 3.0 
+original disctcp v2 cannot copy large file, the total running time will depends
+on the largest file, it will waste a lot of time. In fact we need to split data
+into nearly equal length filechunk in both uniform and dynamic stretagy. At
+last, we can combine the filechunks into target files. It will effciently
+improve the speed of distributed data copy.
+
+# Usage
+You can using this distcp jar, and type hadoop distcp to see the help.
+Simply, you can just use -bychunk argument. Others arguements of distcp are not
+changed. For exmaple, the bychunk argument can be used together with all the
+support stretagies such uniform, and dynamic chunk.
+
+<code>
+hadoop distcp -bychunk -strategy dynamic source target
+hadoop distcp -bychunk -strategy static source target
+</code>
+
+
+Besides this argument, you also can implements your our bychunk code, by modify
+the following properities in your dictp-default.xml
+
+
+<code>
+    <property>
+        <name>distcp.dynamic.strategy.impl</name>
+        <value>org.apache.hadoop.tools.mapred.lib.DynamicInputFormat</value>
+        <description>Implementation of dynamic input format</description>
+    </property>
+
+    <property>
+        <name>distcp.static.strategy.impl</name>
+        <value>org.apache.hadoop.tools.mapred.UniformSizeInputFormat</value>
+        <description>Implementation of static input format</description>
+    </property>
+
+    <property>
+        <name>distcp.bychunk.dynamic.strategy.impl</name>
+        <value>org.apache.hadoop.tools.mapred.lib.DynamicInputFormat</value>
+        <description>Implementation of dynamic input format for chunk</description>
+    </property>
+
+    <property>
+        <name>distcp.bychunk.static.strategy.impl</name>
+        <value>org.apache.hadoop.tools.mapred.filechunk.UniformChunkSizeInputFormat</value>
+        <description>Implementation of static input format for chunk</description>
+    </property>
+
+    <property>
+        <name>distcp.bychunk.mapper.impl</name>
+        <value>org.apache.hadoop.tools.mapred.filechunk.CopyChunkMapper</value>
+        <description>Implementation of chunk Mapper</description>
+    </property>
+</code>
